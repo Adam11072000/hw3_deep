@@ -11,13 +11,13 @@ math (delimited with $$).
 
 def part1_rnn_hyperparams():
     hypers = dict(
-        batch_size=512,
-        seq_len=150,
-        h_dim=320,
+        batch_size=256,
+        seq_len=300,
+        h_dim=512,
         n_layers=4,
         dropout=0.5,
-        learn_rate=0.001,
-        lr_sched_factor=0.5,
+        learn_rate=0.01,
+        lr_sched_factor=0.7,
         lr_sched_patience=5,
     )
     return hypers
