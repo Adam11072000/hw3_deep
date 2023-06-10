@@ -94,22 +94,36 @@ class Trainer(abc.ABC):
             #    simple regularization technique that is highly recommended.
             # ====== YOUR CODE: ======
             
-            raise NotImplementedError()
+            train_result = self.train_epoch(dl_train, verbose=verbose, **kw)
+            train_acc.append(train_result.accuracy)
+            train_loss.append(sum(train_result.losses) / len(train_result.losses))
+
+            test_result = self.test_epoch(dl_test, verbose=verbose, **kw)
+            test_acc.append(test_result.accuracy)
+            test_loss.append(sum(test_result.losses)/len(test_result.losses)) 
+            actual_num_epochs += 1
 
             # ========================
 
             # Save model checkpoint if requested
-            if save_checkpoint and checkpoint_filename is not None:
-                saved_state = dict(
-                    best_acc=best_acc,
-                    ewi=epochs_without_improvement,
-                    model_state=self.model.state_dict(),
-                )
-                torch.save(saved_state, checkpoint_filename)
-                print(
-                    f"*** Saved checkpoint {checkpoint_filename} " f"at epoch {epoch+1}"
-                )
-
+            if best_acc is None or test_result.accuracy > best_acc:
+                best_acc = test_result.accuracy
+                epochs_without_improvement = 0
+                if save_checkpoint and checkpoint_filename is not None:
+                    saved_state = dict(
+                        best_acc=best_acc,
+                        ewi=epochs_without_improvement,
+                        model_state=self.model.state_dict(),
+                    )
+                    torch.save(saved_state, checkpoint_filename)
+                    print(
+                        f"*** Saved checkpoint {checkpoint_filename} " f"at epoch {epoch+1}"
+                    )
+            elif not early_stopping is None:
+                    if epochs_without_improvement == early_stopping:
+                        break
+                    else:
+                        epochs_without_improvement += 1
             if post_epoch_fn:
                 post_epoch_fn(epoch, train_result, test_result, verbose)
 
@@ -250,12 +264,21 @@ class RNNTrainer(Trainer):
         #  - Update params
         #  - Calculate number of correct char predictions
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        score, hidden_state = self.model(x, self.hidden_state)
+        score = score.permute(0,2,1).to(self.device)
+        loss = self.loss_fn(score, y)
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
+
+        pred = torch.argmax(score, dim=1)
+        correct_preds = torch.sum(pred == y).float()
+        self.hidden_state = hidden_state.detach().to(dtype=torch.float, device=self.device)
         # ========================
 
         # Note: scaling num_correct by seq_len because each sample has seq_len
         # different predictions.
-        return BatchResult(loss.item(), num_correct.item() / seq_len)
+        return BatchResult(loss.item(), correct_preds.item() / seq_len)
 
     def test_batch(self, batch) -> BatchResult:
         x, y = batch
@@ -270,10 +293,14 @@ class RNNTrainer(Trainer):
             #  - Loss calculation
             #  - Calculate number of correct predictions
             # ====== YOUR CODE: ======
-            raise NotImplementedError()
+            scores, hidden_state = self.model(x, self.hidden_state)
+            pred = torch.argmax(scores, dim=2)
+            loss = self.loss_fn(scores, torch.nn.functional.one_hot(y, scores.shape[2]).float())
+            correct_preds = torch.sum(pred == y).float()
+            self.hidden_state = hidden_state.detach().to(dtype=torch.float, device=self.device)
             # ========================
 
-        return BatchResult(loss.item(), num_correct.item() / seq_len)
+        return BatchResult(loss.item(), correct_preds.item() / seq_len)
 
 
 class VAETrainer(Trainer):
