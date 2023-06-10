@@ -125,13 +125,13 @@ def chars_to_labelled_samples(text: str, char_to_idx: dict, seq_len: int, device
     #  Note that no explicit loops are required to implement this function.
     # ====== YOUR CODE: ======
     # embed text into a tensor
-    one_hot_text = chars_to_onehot(text, char_to_idx).to(device)
+    one_hot_text = chars_to_onehot(text, char_to_idx)
     # calculate number of samples
     N = one_hot_text.size(0) // seq_len
     #split the samples
     samples = one_hot_text[:N * seq_len].view(N, seq_len, -1)
     # put them into a tensor with the relevant label
-    labels = torch.tensor([char_to_idx[c] for c in text[1:]], device=device)
+    labels = torch.tensor([char_to_idx[c] for c in text[1:]])
     labels = labels[:N * seq_len].view(N, seq_len)
     # ========================
     return samples, labels

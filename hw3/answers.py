@@ -11,12 +11,12 @@ math (delimited with $$).
 
 def part1_rnn_hyperparams():
     hypers = dict(
-        batch_size=256,
+        batch_size=500,
         seq_len=300,
         h_dim=512,
-        n_layers=4,
+        n_layers=3,
         dropout=0.5,
-        learn_rate=0.01,
+        learn_rate=0.001,
         lr_sched_factor=0.7,
         lr_sched_patience=5,
     )
@@ -24,8 +24,8 @@ def part1_rnn_hyperparams():
 
 
 def part1_generation_params():
-    start_seq = ""
-    temperature = 0.0001
+    start_seq = "ACT I"
+    temperature = 0.4
     # TODO: Tweak the parameters to generate a literary masterpiece.
     # ====== YOUR CODE: ======
     

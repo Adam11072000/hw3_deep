@@ -109,7 +109,7 @@ class Trainer(abc.ABC):
             if best_acc is None or test_result.accuracy > best_acc:
                 best_acc = test_result.accuracy
                 epochs_without_improvement = 0
-                if save_checkpoint and checkpoint_filename is not None:
+                if checkpoint_filename is not None:
                     saved_state = dict(
                         best_acc=best_acc,
                         ewi=epochs_without_improvement,
