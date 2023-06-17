@@ -1,0 +1,4 @@
+hw3/__pycache__/
+hw3/.*
+cs236781/
+.ipynb_checkpoints/*
