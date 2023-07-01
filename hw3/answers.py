@@ -77,33 +77,49 @@ def part2_vae_hyperparams():
     )
     # TODO: Tweak the hyperparameters to generate a former president.
     # ====== YOUR CODE: ======
-   
+    hypers = dict(
+        batch_size = 64,
+        h_dim = 256,
+        z_dim = 64,
+        x_sigma2 = 0.0015,
+        learn_rate = 0.0003,
+        betas = (0.9, 0.9)
+    )
     # ========================
     return hypers
 
 
 part2_q1 = r"""
 **Your answer:**
-
+The sigma squared is a hyperparameter which basically controls variance from the mean image.
+For low values of sigma, the model will generate photos that are closer to the mean image that the model has learnt thourghout the training process.
+For higher values of sigma, the model will branch out and generate images that can vary from the mean image.
 
 """
 
 part2_q2 = r"""
 **Your answer:**
+1. reconstruction loss: gives an indication of how good/bad the decoder tried to reconstruct the original signal x.
+   KL divergence: gives an indication of the difference between the learnt latent distribution of the VAE and the original set distribution.
+   
+2. Basically the KL divergence loss changes the mu and sigma_2 parameters to make the posterior distibution of the latent close as possible to the prior distribution.
 
-
+3. The main benefit of using KL Divergence loss term is that making the posterior distibution of the latent close as possible to the prior distribution will gives images that are closer to 
+   the original picture, that is due to the fact that we trained our model to generate images that are in the vacinity of the original image.
 """
 
 part2_q3 = r"""
 **Your answer:**
-
+We maximize the evidence distribution to inderictly maximize the observed data probibality, which in turn ensures that we can find the distribution of where the learnt data came from.
 
 
 """
 
 part2_q4 = r"""
 **Your answer:**
-
+There are a couple of reasons of why we may use the log space:
+1. Log treats us with significantlly smaller numbers than regular space, this may ensure that we are more stable when performing mathematical operations.
+2. P(x) is a multiple between P(x_i) for i in data, we saw in machine learining course before that it is easier to solve an Minimization/Maximization problem in the log scale than the regular scale because we will work on sum rather than multiplication
 
 """
 
@@ -149,15 +165,25 @@ a trivial answer is to make the window bigger, thus having a more global context
 
 part4_q1 = r"""
 **Your answer:**
-
-
+in comparission to part3, the fine tuning performed better without any outside factors. 
+The reason may be credited to multiple factors:
+1. The model had a noticeably larger dataset for the training.
+2. The pretraining tasks were quite similar to the downstream tasks.
+3. The model itself we are using is larger than the model used in the last part.
+from reason 2 we can conclude that the pretraining phase was a very helpful way to ensure we get pretty good results.
+To summarize, if the downstream task is within the same domain/realm of the pretrain tasks, we expect to see better results in fine tuning over trainig a model from scratch, however, if the downstream task's realm is unknown or the different from the pretrain tasks, we may find that the scratch model will give better results.
 """
 
 part4_q2 = r"""
 **Your answer:**
-
+The following suggestion (internal layer freezing) is not ruled out for fine tuning purposes, however, if we look into it from a general point of view, it is likely that the results may be worse that fine tuning the later stages of layers.
+Per defintion, the earlier layers (beginning and middle) grasp a more general idea of our features while the later stages are those who are task specific.
+This in turn means that freezing a middle layer can majorly distrubt the training proccess and may interfere with knowing how to similar features/sequences that are found in different tasks.
 
 """
+
+
+
 
 
 # ==============
