@@ -159,7 +159,10 @@ in a sliding window attention, each layer processes an input from a larger conte
 
 part3_q2 = r"""
 **Your answer:**
-a trivial answer is to make the window bigger, thus having a more global context than a small window (check with abugosh)
+one way is dialated window attention, where the model attends to the current window w, can also attend to other elements in the sequence that are exponentially far from the curent position in the sequence.
+for example, if the model is attending to position i and its window, the model can also take into account i + 2w, i + 4w, i + 8w, .... elements and attend to them, but with smaller weights becauser intuitivly, more attention should
+be given to closer positions rather than distant elements.
+the number of elements that the model attends to can still be capped to ensure the same time complexity.
 """
 
 
